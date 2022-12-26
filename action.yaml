@@ -1,0 +1,40 @@
+name: pack-checker
+description: Check a PopTracker pack
+
+inputs:
+  pack:
+    description: 'Path to the pack to validate'
+    required: true
+    default: '.'
+  schema:
+    description: 'Schema to validate against'
+    required: true
+    default: 'https://poptracker.github.io/schema/packs/'
+  strict:
+    description: 'true for strict mode, false for lax mode'
+    type: string
+    required: true
+    default: false
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check out pack-checker
+      shell: bash
+      run: |
+        cd "${{ github.action_path }}"
+        [ -d "pack-checker" ] || git clone -q --branch v1 --depth 1 --recurse-submodules https://github.com/PopTracker/pack-checker.git
+    - name: Install dependencies
+      shell: bash
+      run: |
+        pip install -r "${{ github.action_path }}/pack-checker/requirements.txt"
+    - name: Run pack-checker (lax)
+      if: ${{ inputs.strict == 'false' }}
+      shell: bash
+      run: |
+        python "${{ github.action_path }}/pack-checker/pack_checker.py" -b --schema ${{ inputs.schema }} ${{ inputs.pack }}
+    - name: Run pack-checker (strict)
+      if: ${{ inputs.strict != 'false' }}
+      shell: bash
+      run: |
+        python "${{ github.action_path }}/pack-checker/pack_checker.py" -b --schema ${{ inputs.schema }} --strict ${{ inputs.pack }}
