@@ -15,6 +15,11 @@ inputs:
     type: string
     required: true
     default: false
+  check-legacy-compat:
+    description: 'true (default) enables checks for legacy compatibility'
+    type: string
+    required: true
+    default: true
 
 runs:
   using: "composite"
@@ -23,7 +28,7 @@ runs:
       shell: bash
       run: |
         cd "${{ github.action_path }}"
-        [ -d "pack-checker" ] || git clone -q --branch v1 --depth 1 --recurse-submodules https://github.com/PopTracker/pack-checker.git
+        [ -d "pack-checker" ] || git clone -q --branch v1.4 --depth 1 --recurse-submodules https://github.com/PopTracker/pack-checker.git
     - name: Install dependencies
       shell: bash
       run: |
@@ -32,9 +37,15 @@ runs:
       if: ${{ inputs.strict == 'false' }}
       shell: bash
       run: |
-        python "${{ github.action_path }}/pack-checker/pack_checker.py" -b --schema ${{ inputs.schema }} ${{ inputs.pack }}
+        EXTRA=""
+        if [[ "${{ inputs.check-legacy-compat }}" == "true" ]]; then EXTRA="$EXTRA --check-legacy-compat"; fi
+        if [[ "${{ inputs.check-legacy-compat }}" == "false" ]]; then EXTRA="$EXTRA --no-legacy-compat"; fi
+        python "${{ github.action_path }}/pack-checker/pack_checker.py" -b --schema "${{ inputs.schema }}" "${{ inputs.pack }}" $EXTRA
     - name: Run pack-checker (strict)
       if: ${{ inputs.strict != 'false' }}
       shell: bash
       run: |
-        python "${{ github.action_path }}/pack-checker/pack_checker.py" -b --schema ${{ inputs.schema }} --strict ${{ inputs.pack }}
+        EXTRA=""
+        if [[ "${{ inputs.check-legacy-compat }}" == "true" ]]; then EXTRA="$EXTRA --check-legacy-compat"; fi
+        if [[ "${{ inputs.check-legacy-compat }}" == "false" ]]; then EXTRA="$EXTRA --no-legacy-compat"; fi
+        python "${{ github.action_path }}/pack-checker/pack_checker.py" -b --schema "${{ inputs.schema }}" --strict "${{ inputs.pack }}" $EXTRA
