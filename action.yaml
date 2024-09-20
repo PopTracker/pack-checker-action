@@ -28,7 +28,7 @@ runs:
       shell: bash
       run: |
         cd "${{ github.action_path }}"
-        [ -d "pack-checker" ] || git clone -q --branch v1.4 --depth 1 --recurse-submodules https://github.com/PopTracker/pack-checker.git
+        [ -d "pack-checker" ] || git clone -q --branch v1 --depth 1 --recurse-submodules https://github.com/PopTracker/pack-checker.git
     - name: Install dependencies
       shell: bash
       run: |
