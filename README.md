@@ -19,4 +19,5 @@ or
           strict: true
           schema: path/to/schema
           pack: path/to/pack
+          check-legacy-compat: true
 ```
