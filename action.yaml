@@ -20,6 +20,11 @@ inputs:
     type: string
     required: true
     default: true
+  validate-external:
+    description: 'true enables validation of select known external schemas, default false'
+    type: string
+    required: true
+    default: false
 
 runs:
   using: "composite"
@@ -28,7 +33,7 @@ runs:
       shell: bash
       run: |
         cd "${{ github.action_path }}"
-        [ -d "pack-checker" ] || git clone -q --branch v1 --depth 1 --recurse-submodules https://github.com/PopTracker/pack-checker.git
+        [ -d "pack-checker" ] || git clone -q --branch v1.7.0 --depth 1 --recurse-submodules https://github.com/PopTracker/pack-checker.git
     - name: Install dependencies
       shell: bash
       run: |
@@ -40,6 +45,8 @@ runs:
         EXTRA=""
         if [[ "${{ inputs.check-legacy-compat }}" == "true" ]]; then EXTRA="$EXTRA --check-legacy-compat"; fi
         if [[ "${{ inputs.check-legacy-compat }}" == "false" ]]; then EXTRA="$EXTRA --no-legacy-compat"; fi
+        if [[ "${{ inputs.validate-external }}" == "true" ]]; then EXTRA="$EXTRA --validate-external"; fi
+        if [[ "${{ inputs.validate-external }}" == "false" ]]; then EXTRA="$EXTRA --no-validate-external"; fi
         python "${{ github.action_path }}/pack-checker/pack_checker.py" -b --schema "${{ inputs.schema }}" "${{ inputs.pack }}" $EXTRA
     - name: Run pack-checker (strict)
       if: ${{ inputs.strict != 'false' }}
@@ -48,4 +55,6 @@ runs:
         EXTRA=""
         if [[ "${{ inputs.check-legacy-compat }}" == "true" ]]; then EXTRA="$EXTRA --check-legacy-compat"; fi
         if [[ "${{ inputs.check-legacy-compat }}" == "false" ]]; then EXTRA="$EXTRA --no-legacy-compat"; fi
+        if [[ "${{ inputs.validate-external }}" == "true" ]]; then EXTRA="$EXTRA --validate-external"; fi
+        if [[ "${{ inputs.validate-external }}" == "false" ]]; then EXTRA="$EXTRA --no-validate-external"; fi
         python "${{ github.action_path }}/pack-checker/pack_checker.py" -b --schema "${{ inputs.schema }}" --strict "${{ inputs.pack }}" $EXTRA
