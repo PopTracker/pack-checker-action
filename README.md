@@ -7,7 +7,7 @@ Action to automate PopTracker pack checking / schema validation.
 
 ```yaml
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: PopTracker/pack-checker-action@v1
 ```
 
@@ -15,6 +15,7 @@ or
 
 ```yaml
     steps:
+      - uses: actions/checkout@v7
       - uses: PopTracker/pack-checker-action@v1
         with:
           strict: true
